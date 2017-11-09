@@ -1,0 +1,220 @@
+|com.bds.fixture.RandomFixture|
+|=getTimeInMilli?             |
+|random1                      |
+
+
+
+
+
+'''Verify user cannot create a project without using cookie'''
+|smartrics.rest.fitnesse.fixture.FitRestFixture|${serverName}|
+|setHeader                                                   |!-Content-Type : application/json-! |
+|setBody|!-{
+  "name": "TestPRoject-1",
+  "tier": "",
+  "projectOwnerId": "",
+  "projectLevelAdjustments": true,
+  "release": {
+    "phase": "PLANNING",
+    "distribution": "EXTERNAL",
+    "projectLevelAdjustments": true,
+    "version": "1"
+  }
+}-!|
+|POST   |/api/projects| 403 |                               ||
+
+
+
+
+|smartrics.rest.fitnesse.fixture.FitRestFixture|${serverName}|
+|setHeader                                                   |!-Cookie: JSESSIONID=-!%cookie%!-
+Content-Type: application/json -!!-
+-!%csrf_header%!-:-!%csrf_token%|
+|GET   |/api/projects| 200 | ||
+|let|initialTotalProjects|js|response.jsonbody.totalCount||
+
+
+
+
+
+'''Verify user  create a project without using cookie'''
+|smartrics.rest.fitnesse.fixture.FitRestFixture|${serverName}|
+|setHeader                                                   |!-Cookie: JSESSIONID=-!%cookie%!-
+Content-Type: application/json -!!-
+-!%csrf_header%!-:-!%csrf_token%|
+|setBody|!-{
+  "name": "TestPRoject-!%random1%!-",
+  "tier": "",
+  "projectOwnerId": "",
+  "projectLevelAdjustments": true,
+  "release": {
+    "phase": "PLANNING",
+    "distribution": "EXTERNAL",
+    "projectLevelAdjustments": true,
+    "version": "1"
+  }
+}-!|
+|POST   |/api/projects| 201 |                               ||
+|let|projectLocation1|header|Location:(.+)||
+
+
+
+
+
+
+|smartrics.rest.fitnesse.fixture.FitRestFixture|${serverName}|
+|setHeader                                                   |!-Cookie: JSESSIONID=-!%cookie%!-
+Content-Type: application/json -!!-
+-!%csrf_header%!-:-!%csrf_token%|
+|setBody|!-{
+  "name": "TestPRoject-1-!%random1%!-",
+  "tier": "",
+  "projectOwnerId": "",
+  "projectLevelAdjustments": true,
+  "release": {
+    "phase": "PLANNING",
+    "distribution": "EXTERNAL",
+    "projectLevelAdjustments": true,
+    "version": "1"
+  }
+}-!|
+|POST   |/api/projects| 201 |                               ||
+|let|projectLocation2|header|Location:(.+)||
+
+
+
+'''Create a third project'''
+|smartrics.rest.fitnesse.fixture.FitRestFixture|${serverName}|
+|setHeader                                                   |!-Cookie: JSESSIONID=-!%cookie%!-
+Content-Type: application/json -!!-
+-!%csrf_header%!-:-!%csrf_token%|
+|setBody|!-{
+  "name": "TestPRoject-2-!%random1%!-",
+  "tier": "",
+  "projectOwnerId": "",
+  "projectLevelAdjustments": true,
+  "release": {
+    "phase": "PLANNING",
+    "distribution": "EXTERNAL",
+    "projectLevelAdjustments": true,
+    "version": "1"
+  }
+}-!|
+|POST   |/api/projects| 201 |                               ||
+|let|projectLocation3|header|Location:(.+)||
+
+
+
+
+
+
+'''Verify user cannot create a project with existing name'''
+|smartrics.rest.fitnesse.fixture.FitRestFixture|${serverName}|
+|setHeader                                                   |!-Cookie: JSESSIONID=-!%cookie%!-
+Content-Type: application/json -!!-
+-!%csrf_header%!-:-!%csrf_token%|
+|setBody|!-{
+  "name": "TestPRoject-!%random1%!-",
+  "tier": "",
+  "projectOwnerId": "",
+  "projectLevelAdjustments": true,
+  "release": {
+    "phase": "PLANNING",
+    "distribution": "EXTERNAL",
+    "projectLevelAdjustments": true,
+    "version": "1"
+  }
+}-!|
+|POST   |/api/projects| 412 |       ||
+|let||js|response.jsonbody.errorMessage|Project name already exists|
+
+
+
+
+
+|smartrics.rest.fitnesse.fixture.FitRestFixture|${serverName}|
+|setHeader                                                   |!-Cookie: JSESSIONID=-!%cookie%!-
+Content-Type: application/json -!!-
+-!%csrf_header%!-:-!%csrf_token%|
+|GET   |/api/projects| 200 |       ||
+|let||js|response.jsonbody.totalCount==%initialTotalProjects%+3|true|
+|let|secondProjectName|js|response.jsonbody.items[1].name||
+
+
+
+
+|smartrics.rest.fitnesse.fixture.FitRestFixture|${serverName}|
+|setHeader                                                   |!-Cookie: JSESSIONID=-!%cookie%!-
+Content-Type: application/json -!!-
+-!%csrf_header%!-:-!%csrf_token%|
+|GET   |/api/projects?limit=1&offset=1| 200 |       ||
+|let||js|response.jsonbody.items[0].name|%secondProjectName%|
+|let|secondProjectName|js|response.jsonbody.items.length==1|true|
+
+
+
+
+
+|smartrics.rest.fitnesse.fixture.FitRestFixture|${serverName}|
+|setHeader                                                   |!-Cookie: JSESSIONID=-!%cookie%!-
+Content-Type: application/json -!!-
+-!%csrf_header%!-:-!%csrf_token%|
+|GET   |/api/projects?q=name:%random1%| 200 |       ||
+
+
+
+
+
+
+
+'''Update a project'''
+|smartrics.rest.fitnesse.fixture.FitRestFixture|${serverName}|
+|setHeader                                                   |!-Cookie: JSESSIONID=-!%cookie%!-
+Content-Type: application/json -!!-
+-!%csrf_header%!-:-!%csrf_token%|
+|setBody|!-{
+  "name": "Updated-TestPRoject-!%random1%!-",
+  "tier": "",
+  "projectOwnerId": "",
+  "projectLevelAdjustments": true,
+  "release": {
+    "phase": "DEVELOPMENT",
+    "distribution": "EXTERNAL",
+    "projectLevelAdjustments": true,
+    "version": "1"
+  }
+}-!|
+|PUT   |%projectLocation1%| 200 |                               ||
+
+
+
+
+|smartrics.rest.fitnesse.fixture.FitRestFixture|${serverName}|
+|setHeader                                                   |!-Cookie: JSESSIONID=-!%cookie%!-
+Content-Type: application/json -!!-
+-!%csrf_header%!-:-!%csrf_token%|
+|GET   |%projectLocation1%| 200 |       ||
+|let||js|response.jsonbody.name|Updated-TestPRoject%random1%|
+
+
+
+
+|smartrics.rest.fitnesse.fixture.FitRestFixture|${serverName}|
+|setHeader                                                   |!-Cookie: JSESSIONID=-!%cookie%!-
+Content-Type: application/json -!!-
+-!%csrf_header%!-:-!%csrf_token%|
+|DELETE  |%projectLocation1%| 204 |       ||
+|DELETE  |%projectLocation2%| 204 |       ||
+|DELETE  |%projectLocation3%| 204 |       ||
+
+
+
+
+
+
+
+
+
+
+
+

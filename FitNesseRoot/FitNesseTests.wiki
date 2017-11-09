@@ -1,0 +1,12 @@
+!contents -R2 -g -p -f -h
+
+
+!path /Users/aarya/Desktop/Deepika/RestFixture/lib/*
+!path /Users/aarya/Desktop/Deepika/fitnesse.jar
+!path /Users/aarya/Desktop/Deepika/bdsfixture.jar
+
+
+
+!define serverName {https://qa-hub22.dc1.lan}
+
+

@@ -1,0 +1,21 @@
+---
+Test
+---
+!| smartrics.rest.fitnesse.fixture.RestFixtureConfig|
+|http.client.connection.timeout       |60000        |
+|http.socket.timeout                  |60000        |
+
+
+
+
+
+|smartrics.rest.fitnesse.fixture.FitRestFixture|${serverName}|
+|setHeader                                                   |!-Content-Type : application/x-www-form-urlencoded-! |
+|setBody|!-j_username=-!sysadmin!-&amp;j_password=-!blackduck       |
+|POST   |/j_spring_security_check| 204  |                               ||
+|let    |cookie                  |header|JSESSIONID=([A-Z,a-z,0-9]{32});||
+|let    |csrf_header             |header|X-CSRF-HEADER:(.+)             ||
+|let    |csrf_token              |header|X-CSRF-TOKEN:(.+)              ||
+
+
+
